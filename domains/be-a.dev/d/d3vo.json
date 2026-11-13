@@ -1,0 +1,11 @@
+{
+  "$schema": "../../../schemas/domain.schema.json",
+  "description": "Founder personal website",
+  "owner": {
+    "username": "xdearboy"
+  },
+  "records": {
+    "CNAME": "d3vo.ru."
+  },
+  "ttl": 300
+}

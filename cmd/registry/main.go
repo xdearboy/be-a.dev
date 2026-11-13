@@ -167,7 +167,7 @@ func runServe(args []string) {
 
 func runExpiry(args []string) {
 	fs := flag.NewFlagSet("expiry", flag.ExitOnError)
-	zonesFlag := fs.String("zones", "kra67.space,plmt.tech", "comma-separated list of domains to query")
+	zonesFlag := fs.String("zones", "be-a.dev,kra67.space,plmt.tech", "comma-separated list of domains to query")
 	_ = fs.Parse(args)
 
 	domains := strings.Split(*zonesFlag, ",")

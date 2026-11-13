@@ -76,7 +76,7 @@ func NewServer(domainsDir string, v *validator.Validator) (*Server, error) {
 	return &Server{
 		domainsDir:    domainsDir,
 		validator:     v,
-		primaryZones:  []string{"kra67.space", "plmt.tech"},
+		primaryZones:  []string{"be-a.dev", "kra67.space", "plmt.tech"},
 		fallbackTmpl:  tmpl,
 		expiryChecker: expiry.NewChecker(6 * time.Hour),
 	}, nil
@@ -237,7 +237,7 @@ func (s *Server) handleStatus(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp := StatusResponse{
-		PrimaryZone: "kra67.space",
+		PrimaryZone: "be-a.dev",
 		Nameservers: nsList,
 		Expiry:      s.expiryChecker.CheckMultiple(s.primaryZones),
 		TotalZones:  len(s.primaryZones),

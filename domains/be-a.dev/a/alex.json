@@ -1,0 +1,11 @@
+{
+  "$schema": "../../../schemas/domain.schema.json",
+  "description": "Alex dev portfolio",
+  "owner": {
+    "username": "alex"
+  },
+  "records": {
+    "CNAME": "alex.github.io."
+  },
+  "ttl": 300
+}
