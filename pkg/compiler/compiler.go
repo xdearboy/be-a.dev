@@ -151,6 +151,29 @@ func (c *Compiler) GenerateZone(zone string, configs []*models.DomainConfig) (st
 	}
 	sb.WriteString("\n")
 
+	for _, ns := range c.Nameservers {
+		apexA := &dns.A{
+			Hdr: dns.RR_Header{
+				Name:   origin,
+				Rrtype: dns.TypeA,
+				Class:  dns.ClassINET,
+				Ttl:    300,
+			},
+			A: net.ParseIP(ns.IPv4),
+		}
+		sb.WriteString(apexA.String() + "\n")
+	}
+	wwwRR := &dns.CNAME{
+		Hdr: dns.RR_Header{
+			Name:   dns.Fqdn(fmt.Sprintf("www.%s", zone)),
+			Rrtype: dns.TypeCNAME,
+			Class:  dns.ClassINET,
+			Ttl:    300,
+		},
+		Target: origin,
+	}
+	sb.WriteString(wwwRR.String() + "\n\n")
+
 	for _, cfg := range configs {
 		subdomainFqdn := dns.Fqdn(fmt.Sprintf("%s.%s", cfg.Subdomain, zone))
 		ttl := uint32(cfg.TTL)
