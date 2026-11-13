@@ -15,9 +15,11 @@ spec:
       labels:
         app: free-domains-portal
     spec:
+      imagePullSecrets:
+        - name: ghcr-secret
       containers:
         - name: web
-          image: ghcr.io/xdearboy/free-domains:latest
+          image: ghcr.io/xdearboy/be-a.dev:latest
           command: ["/app/registry", "serve", "--addr", ":8080", "--domains-dir", "/app/domains"]
           resources:
             requests:

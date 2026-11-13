@@ -172,7 +172,21 @@ func (c *Compiler) GenerateZone(zone string, configs []*models.DomainConfig) (st
 		},
 		Target: origin,
 	}
-	sb.WriteString(wwwRR.String() + "\n\n")
+	sb.WriteString(wwwRR.String() + "\n")
+
+	for _, ns := range c.Nameservers {
+		wildcardA := &dns.A{
+			Hdr: dns.RR_Header{
+				Name:   dns.Fqdn(fmt.Sprintf("*.%s", zone)),
+				Rrtype: dns.TypeA,
+				Class:  dns.ClassINET,
+				Ttl:    60,
+			},
+			A: net.ParseIP(ns.IPv4),
+		}
+		sb.WriteString(wildcardA.String() + "\n")
+	}
+	sb.WriteString("\n")
 
 	for _, cfg := range configs {
 		subdomainFqdn := dns.Fqdn(fmt.Sprintf("%s.%s", cfg.Subdomain, zone))

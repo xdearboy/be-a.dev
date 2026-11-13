@@ -3,11 +3,28 @@ kind: Ingress
 metadata:
   name: be-a-dev-portal
   namespace: sites
+  labels:
+    shield/migration: official-controller
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
+    cert-manager.io/private-key-algorithm: ECDSA
+    cert-manager.io/private-key-size: "256"
     haproxy.org/server-proto: h2
 spec:
   ingressClassName: haproxy-official
+  tls:
+    - hosts:
+        - be-a.dev
+        - www.be-a.dev
+      secretName: be-a-dev-tls
+    - hosts:
+        - kra67.space
+        - www.kra67.space
+      secretName: kra67-space-tls
+    - hosts:
+        - plmt.tech
+        - www.plmt.tech
+      secretName: plmt-tech-tls
   rules:
     - host: be-a.dev
       http:

@@ -12,13 +12,7 @@ data:
         errors
         file /etc/coredns/zones/db.be-a.dev {
             reload 5s
-            fallthrough
         }
-        template IN A be-a.dev {
-            match ^([a-zA-Z0-9-]+\.)+be-a\.dev\.$
-            answer "{{ .Name }} 60 IN A 130.78.191.155"
-        }
-        minimal-any
         prometheus :9153
         cache 300
     }
@@ -28,13 +22,7 @@ data:
         errors
         file /etc/coredns/zones/db.kra67.space {
             reload 5s
-            fallthrough
         }
-        template IN A kra67.space {
-            match ^([a-zA-Z0-9-]+\.)+kra67\.space\.$
-            answer "{{ .Name }} 60 IN A 130.78.191.155"
-        }
-        minimal-any
         prometheus :9153
         cache 300
     }
@@ -44,13 +32,7 @@ data:
         errors
         file /etc/coredns/zones/db.plmt.tech {
             reload 5s
-            fallthrough
         }
-        template IN A plmt.tech {
-            match ^([a-zA-Z0-9-]+\.)+plmt\.tech\.$
-            answer "{{ .Name }} 60 IN A 130.78.191.155"
-        }
-        minimal-any
         prometheus :9153
         cache 300
     }
