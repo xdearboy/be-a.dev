@@ -1,0 +1,47 @@
+# Authoritative CoreDNS configuration for free-domains registry
+# RFC 1035, RFC 1982, RFC 2308, RFC 8482 compliant
+
+kra67.space:53 {
+    log
+    errors
+
+    # 1. Authoritative zone file loading with dynamic hot-reload
+    file /etc/coredns/zones/db.kra67.space {
+        reload 5s
+    }
+
+    # 2. Wildcard fallback: Unregistered subdomains resolve to web portal IP for claiming
+    template IN A kra67.space {
+        match ^([a-zA-Z0-9-]+\.)+kra67\.space\.$
+        answer "{{ .Name }} 60 IN A 130.78.191.155"
+        fallthrough
+    }
+
+    # 3. RFC 8482: Mitigate DNS amplification attacks on ANY queries
+    minimal-any
+
+    # 4. Observability & Health
+    prometheus :9153
+    health :8082
+    cache 300
+}
+
+plmt.tech:53 {
+    log
+    errors
+
+    file /etc/coredns/zones/db.plmt.tech {
+        reload 5s
+    }
+
+    template IN A plmt.tech {
+        match ^([a-zA-Z0-9-]+\.)+plmt\.tech\.$
+        answer "{{ .Name }} 60 IN A 130.78.191.155"
+        fallthrough
+    }
+
+    minimal-any
+    prometheus :9153
+    health :8082
+    cache 300
+}

@@ -1,0 +1,51 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: free-domains-portal
+  namespace: sites
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    haproxy.org/server-proto: h2
+spec:
+  ingressClassName: haproxy-official
+  rules:
+    - host: kra67.space
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: free-domains-portal
+                port:
+                  number: 8080
+    - host: "*.kra67.space"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: free-domains-portal
+                port:
+                  number: 8080
+    - host: plmt.tech
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: free-domains-portal
+                port:
+                  number: 8080
+    - host: "*.plmt.tech"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: free-domains-portal
+                port:
+                  number: 8080

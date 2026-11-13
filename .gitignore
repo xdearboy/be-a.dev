@@ -1,0 +1,4 @@
+bin/
+zones/
+*.log
+.DS_Store

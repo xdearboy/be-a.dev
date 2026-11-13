@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: free-domains-portal
+  namespace: sites
+  labels:
+    app: free-domains-portal
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: free-domains-portal
+  template:
+    metadata:
+      labels:
+        app: free-domains-portal
+    spec:
+      containers:
+        - name: web
+          image: ghcr.io/xdearboy/free-domains:latest
+          command: ["/app/registry", "serve", "--addr", ":8080", "--domains-dir", "/app/domains"]
+          resources:
+            requests:
+              cpu: 20m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /api/status
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/status
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 15
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: free-domains-portal
+  namespace: sites
+  labels:
+    app: free-domains-portal
+spec:
+  type: ClusterIP
+  selector:
+    app: free-domains-portal
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080

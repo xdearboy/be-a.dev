@@ -1,0 +1,48 @@
+name: Validate Pull Request
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'domains/**'
+      - 'config/**'
+      - 'pkg/**'
+      - 'cmd/**'
+
+jobs:
+  validate:
+    name: RFC Compliance & Security Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.26'
+
+      - name: Run Test Suite
+        run: go test -v ./...
+
+      - name: Build Registry CLI
+        run: go build -o bin/registry ./cmd/registry
+
+      - name: Get Changed Domain Files
+        id: changed-files
+        uses: tj-actions/changed-files@v44
+        with:
+          files: 'domains/**/*.json'
+
+      - name: Validate Changed Domains
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: |
+          ./bin/registry validate \
+            --actor "${{ github.actor }}" \
+            --files "${{ steps.changed-files.outputs.all_changed_files }}"
+
+      - name: Dry-Run Zone Compilation
+        run: |
+          ./bin/registry compile --out-dir ./zones

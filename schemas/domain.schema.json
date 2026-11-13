@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FreeSubdomainDefinition",
+  "description": "Definition file for free subdomains under kra67.space and plmt.tech",
+  "type": "object",
+  "required": ["owner", "records"],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 256
+    },
+    "owner": {
+      "type": "object",
+      "required": ["username"],
+      "properties": {
+        "username": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9]([a-zA-Z0-9-]{0,37}[a-zA-Z0-9])?$"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        }
+      },
+      "additionalProperties": false
+    },
+    "records": {
+      "type": "object",
+      "minProperties": 1,
+      "properties": {
+        "A": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "ipv4"
+          },
+          "minItems": 1,
+          "maxItems": 10,
+          "uniqueItems": true
+        },
+        "AAAA": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "ipv6"
+          },
+          "minItems": 1,
+          "maxItems": 10,
+          "uniqueItems": true
+        },
+        "CNAME": {
+          "type": "string",
+          "maxLength": 253
+        },
+        "TXT": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "minItems": 1,
+          "maxItems": 10
+        },
+        "NS": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 253
+          },
+          "minItems": 2,
+          "maxItems": 5,
+          "uniqueItems": true
+        },
+        "_acme-challenge": {
+          "type": "string",
+          "maxLength": 255
+        }
+      },
+      "additionalProperties": false
+    },
+    "ttl": {
+      "type": "integer",
+      "minimum": 60,
+      "maximum": 86400,
+      "default": 300
+    }
+  },
+  "additionalProperties": false
+}

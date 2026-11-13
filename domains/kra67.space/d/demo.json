@@ -1,0 +1,13 @@
+{
+  "$schema": "../../../schemas/domain.schema.json",
+  "description": "Demo application on VPS",
+  "owner": {
+    "username": "demo-user"
+  },
+  "records": {
+    "A": ["185.12.34.56"],
+    "AAAA": ["2a00:1450:4001:828::200e"],
+    "TXT": ["google-site-verification=sample-token"]
+  },
+  "ttl": 300
+}
