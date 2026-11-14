@@ -6,24 +6,23 @@
   <title>{{.Subdomain}}.{{.Zone}} &mdash; Available Subdomain</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/style.css">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
 </head>
 <body>
-  <div class="container">
+  <div class="wrap">
     <div class="fallback-box">
-      <span class="status-pill status-available" style="margin-bottom: 1.25rem;">Available Subdomain</span>
-      <h1><span>{{.Subdomain}}</span>.{{.Zone}}</h1>
-      <p>This subdomain is currently unallocated and ready to be claimed for free via GitOps.</p>
+      <h1>{{.Subdomain}}.{{.Zone}}</h1>
+      <p>This subdomain is currently unallocated and available to claim for free via GitOps.</p>
 
       <div class="fallback-actions">
         <a href="https://github.com/xdearboy/be-a.dev/new/main?filename=domains/{{.Zone}}/{{.Shard}}/{{.Subdomain}}.json"
-           target="_blank" rel="noopener" class="btn btn-primary">
-          Claim {{.Subdomain}}.{{.Zone}} on GitHub
+           target="_blank" rel="noopener" class="btn-primary">
+          Claim on GitHub &rarr;
         </a>
-        <a href="https://be-a.dev" class="btn btn-secondary">
-          Search Other Subdomains
+        <a href="https://be-a.dev" class="btn-secondary">
+          Back to Search
         </a>
       </div>
     </div>

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>be-a.dev &mdash; Free Subdomains</title>
-  <meta name="description" content="Free, clean subdomains for developers. GitOps-driven, CoreDNS-backed.">
+  <meta name="description" content="Free, minimal subdomains for developers. GitOps-driven, CoreDNS-backed.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -18,42 +18,46 @@
       <nav class="links">
         <a href="#about">About</a>
         <a href="#records">Records</a>
-        <a href="#nodes">Nameservers</a>
+        <a href="#nameservers">Nameservers</a>
         <a href="https://github.com/xdearboy/be-a.dev" target="_blank" rel="noopener">GitHub</a>
       </nav>
     </header>
 
     <main>
       <!-- Hero -->
-      <section class="intro">
+      <section class="hero">
         <h1>Free subdomains for developers.</h1>
         <p class="lead">
-          Free, persistent <code>*.be-a.dev</code> subdomains for your websites, bots, and APIs.
-          Maintained in a public GitHub repo, backed by CoreDNS across European edge servers.
+          Persistent <code>*.be-a.dev</code> subdomains for your websites, bots, and APIs.
+          Maintained via GitOps in a public GitHub repository, backed by authoritative CoreDNS edge nodes.
         </p>
 
         <!-- Search -->
         <div class="search-wrap">
-          <div class="search-bar">
-            <input type="text" id="search-input" placeholder="subdomain" autocomplete="off" spellcheck="false" autofocus>
-            <span class="tld">.be-a.dev</span>
+          <div class="search-form">
+            <div class="search-input-box">
+              <input type="text" id="search-input" placeholder="subdomain" autocomplete="off" spellcheck="false" autofocus>
+              <span class="tld">.be-a.dev</span>
+            </div>
             <button id="search-btn" class="search-submit">Check</button>
           </div>
           <div id="results-container" class="results-box"></div>
         </div>
       </section>
 
-      <!-- How it works (Direct & Technical, no AI cards) -->
+      <hr class="divider">
+
+      <!-- How it works -->
       <section id="about" class="block">
         <h2>How it works</h2>
         <p>
-          Each subdomain is defined by a single JSON file under <code>domains/be-a.dev/&lt;first-letter&gt;/&lt;name&gt;.json</code> in the repository.
-          To claim or update a domain, submit a Pull Request. CI validates your records and upon merge, changes go live globally within seconds.
+          Each subdomain is defined by a single JSON file under <code>domains/be-a.dev/&lt;letter&gt;/&lt;name&gt;.json</code>.
+          Submit a Pull Request with your configuration. When merged, CI validates your records and syncs changes globally within seconds.
         </p>
 
-        <div class="code-example">
-          <div class="code-title">domains/be-a.dev/a/alex.json</div>
-<pre><code>{
+        <div class="code-box">
+          <div class="code-header">domains/be-a.dev/a/alex.json</div>
+          <pre><code>{
   "owner": {
     "username": "alex"
   },
@@ -64,61 +68,59 @@
         </div>
       </section>
 
+      <hr class="divider">
+
       <!-- Supported Records -->
       <section id="records" class="block">
         <h2>Supported records</h2>
-        <div class="spec-list">
-          <div class="spec-row">
-            <span class="spec-type">CNAME</span>
-            <span class="spec-desc">Point to GitHub Pages, Vercel, Fly.io, Cloudflare, etc. (must end with a dot).</span>
+        <div class="record-table">
+          <div class="record-row">
+            <span class="record-type">CNAME</span>
+            <span class="record-desc">Point to GitHub Pages, Vercel, Fly.io, Cloudflare, etc. (must end with a dot).</span>
           </div>
-          <div class="spec-row">
-            <span class="spec-type">A</span>
-            <span class="spec-desc">Direct IPv4 addresses of your server or VPS.</span>
+          <div class="record-row">
+            <span class="record-type">A</span>
+            <span class="record-desc">Direct IPv4 addresses of your server or VPS.</span>
           </div>
-          <div class="spec-row">
-            <span class="spec-type">AAAA</span>
-            <span class="spec-desc">IPv6 addresses for modern dual-stack routing.</span>
+          <div class="record-row">
+            <span class="record-type">AAAA</span>
+            <span class="record-desc">IPv6 addresses for modern dual-stack routing.</span>
           </div>
-          <div class="spec-row">
-            <span class="spec-type">TXT</span>
-            <span class="spec-desc">Verification tokens, ACME challenges, or SPF records.</span>
+          <div class="record-row">
+            <span class="record-type">TXT</span>
+            <span class="record-desc">Verification tokens, ACME challenges, or SPF records.</span>
           </div>
-          <div class="spec-row">
-            <span class="spec-type">NS</span>
-            <span class="spec-desc">Delegate DNS management of your subdomain to your own nameservers.</span>
+          <div class="record-row">
+            <span class="record-type">NS</span>
+            <span class="record-desc">Delegate DNS management of your subdomain to external nameservers.</span>
           </div>
         </div>
       </section>
 
+      <hr class="divider">
+
       <!-- Nameservers -->
-      <section id="nodes" class="block">
-        <h2>Authoritative nameservers</h2>
-        <p class="dim">
-          CoreDNS 1.12 DaemonSets deployed with public anycast/edge endpoints:
+      <section id="nameservers" class="block">
+        <h2>Nameservers</h2>
+        <p>
+          Authoritative CoreDNS 1.12 edge nodes deployed across European data centers:
         </p>
-        <div class="ns-list" id="status-grid">
+        <div class="ns-table" id="status-grid">
           <div class="ns-row">
             <span class="ns-name">ns1.be-a.dev</span>
             <span class="ns-ip">130.78.191.155</span>
-            <span class="ns-geo">Amsterdam, NL</span>
+            <span class="ns-geo">Netherlands (NL)</span>
           </div>
           <div class="ns-row">
             <span class="ns-name">ns2.be-a.dev</span>
             <span class="ns-ip">191.44.118.80</span>
-            <span class="ns-geo">Frankfurt, DE</span>
+            <span class="ns-geo">Germany (DE)</span>
           </div>
           <div class="ns-row">
             <span class="ns-name">ns3.be-a.dev</span>
             <span class="ns-ip">222.167.248.169</span>
-            <span class="ns-geo">Warsaw, PL</span>
+            <span class="ns-geo">Poland (PL)</span>
           </div>
-        </div>
-
-        <div class="dig-test">
-          <span>Test query:</span>
-          <code id="dig-command">dig @ns1.be-a.dev d3vo.be-a.dev +noall +answer</code>
-          <button id="copy-dig-btn" class="copy-link">copy</button>
         </div>
       </section>
     </main>
@@ -126,17 +128,17 @@
     <!-- Claim Modal -->
     <div id="claim-modal" class="modal-layer">
       <div class="modal-window">
-        <div class="modal-head">
+        <div class="modal-header">
           <h3>Register <span id="modal-domain-title">name.be-a.dev</span></h3>
-          <button id="modal-close" class="modal-x">&times;</button>
+          <button id="modal-close" class="modal-close" aria-label="Close">&times;</button>
         </div>
 
-        <div class="input-line">
+        <div class="field">
           <label for="github-username">GitHub username</label>
-          <input type="text" id="github-username" placeholder="your-github-username" autocomplete="off">
+          <input type="text" id="github-username" placeholder="your-username" autocomplete="off">
         </div>
 
-        <div class="input-line">
+        <div class="field">
           <label for="record-type">Record type</label>
           <select id="record-type">
             <option value="CNAME">CNAME &mdash; GitHub Pages, Vercel, Fly.io</option>
@@ -147,32 +149,38 @@
           </select>
         </div>
 
-        <div class="input-line">
+        <div class="field">
           <label for="record-target" id="record-target-label">Target host</label>
           <input type="text" id="record-target" placeholder="username.github.io">
-          <small id="record-target-hint" class="input-help">Hostname where traffic should be routed.</small>
+          <span id="record-target-hint" class="field-hint">Hostname where traffic should be routed.</span>
         </div>
 
-        <div class="input-line">
+        <div class="field">
           <label>File preview</label>
-          <pre id="json-preview" class="preview-code"></pre>
+          <pre id="json-preview" class="json-box"></pre>
         </div>
 
-        <a id="submit-pr-btn" href="#" target="_blank" rel="noopener" class="button-pr">
+        <a id="submit-pr-btn" href="#" target="_blank" rel="noopener" class="btn-submit">
           Open Pull Request &rarr;
         </a>
       </div>
     </div>
 
+    <hr class="divider">
+
     <!-- Footer -->
     <footer class="footer">
       <div class="footer-left">
-        <span>be-a.dev</span> &bull; <span>free developer registry</span> &bull; <span id="expiry-text">registered through Nov 2027</span>
+        <span>be-a.dev</span>
+        <span>&bull;</span>
+        <span>free developer registry</span>
+        <span>&bull;</span>
+        <span id="expiry-text">registered through Nov 2027</span>
       </div>
       <div class="footer-right">
         <a href="https://github.com/xdearboy/be-a.dev" target="_blank" rel="noopener">GitHub</a>
         <a href="/metrics" target="_blank" rel="noopener">Metrics</a>
-        <a href="/api/status" target="_blank" rel="noopener">Status API</a>
+        <a href="/api/status" target="_blank" rel="noopener">Status</a>
       </div>
     </footer>
   </div>

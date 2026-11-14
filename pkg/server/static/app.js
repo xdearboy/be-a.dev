@@ -12,65 +12,59 @@ document.addEventListener("DOMContentLoaded", () => {
   const githubUserInput = document.getElementById("github-username");
   const jsonPreview = document.getElementById("json-preview");
   const submitPrBtn = document.getElementById("submit-pr-btn");
-  const copyDigBtn = document.getElementById("copy-dig-btn");
-  const digCommand = document.getElementById("dig-command");
   const expiryText = document.getElementById("expiry-text");
 
   let currentSubdomain = "";
   let currentZone = "be-a.dev";
   let searchTimeout = null;
 
-  // Copy dig command
-  if (copyDigBtn && digCommand) {
-    copyDigBtn.addEventListener("click", async () => {
-      try {
-        await navigator.clipboard.writeText(digCommand.innerText.trim());
-        copyDigBtn.innerText = "copied!";
-        setTimeout(() => {
-          copyDigBtn.innerText = "copy";
-        }, 2000);
-      } catch (err) {
-        console.warn("copy failed", err);
-      }
-    });
-  }
-
-  // Live search debounce
+  // Search only on Enter or clicking Check
   if (searchInput) {
     searchInput.addEventListener("input", () => {
-      clearTimeout(searchTimeout);
-      const query = sanitizeInput(searchInput.value);
-      if (!query) {
-        resultsContainer.innerHTML = "";
-        return;
-      }
-      searchTimeout = setTimeout(() => performSearch(query), 180);
+      if (resultsContainer) resultsContainer.innerHTML = "";
     });
 
     searchInput.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
         e.preventDefault();
-        clearTimeout(searchTimeout);
-        const query = sanitizeInput(searchInput.value);
-        if (query) performSearch(query);
+        triggerSearch();
       }
     });
   }
 
   if (searchBtn) {
     searchBtn.addEventListener("click", () => {
-      const query = sanitizeInput(searchInput.value);
-      if (query) performSearch(query);
+      triggerSearch();
     });
   }
 
+  function triggerSearch() {
+    if (!searchInput) return;
+    const query = sanitizeInput(searchInput.value);
+    if (!query) {
+      if (resultsContainer) resultsContainer.innerHTML = "";
+      return;
+    }
+    if (query.length < 2) {
+      if (resultsContainer) {
+        resultsContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 0.84rem; padding: 0.5rem 0;">Subdomain must be at least 2 characters.</p>`;
+      }
+      return;
+    }
+    performSearch(query);
+  }
+
   function sanitizeInput(raw) {
-    return raw.trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
+    return raw.trim().toLowerCase().replace(/\.?be-a\.dev$/i, "").replace(/[^a-z0-9-]/g, "");
   }
 
   async function performSearch(query) {
     if (!resultsContainer) return;
-    resultsContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem;">Checking availability...</p>`;
+    if (searchBtn) {
+      searchBtn.disabled = true;
+      searchBtn.innerText = "Checking...";
+    }
+    resultsContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 0.84rem; padding: 0.5rem 0;">Checking ${escapeHtml(query)}.be-a.dev...</p>`;
 
     try {
       const res = await fetch(`/api/check?name=${encodeURIComponent(query)}`);
@@ -78,7 +72,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
       renderResults(data);
     } catch (err) {
-      resultsContainer.innerHTML = `<p style="color: var(--red); font-size: 0.85rem;">Failed to check availability.</p>`;
+      resultsContainer.innerHTML = `<p style="color: var(--red); font-size: 0.84rem; padding: 0.5rem 0;">Failed to check availability.</p>`;
+    } finally {
+      if (searchBtn) {
+        searchBtn.disabled = false;
+        searchBtn.innerText = "Check";
+      }
     }
   }
 
@@ -86,21 +85,25 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!resultsContainer) return;
 
     if (!data.results || data.results.length === 0) {
-      resultsContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem;">No results found.</p>`;
+      resultsContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 0.84rem; padding: 0.5rem 0;">No results found.</p>`;
       return;
     }
 
     resultsContainer.innerHTML = data.results.map(r => {
+      let dotClass = "dot-avail";
       let stateClass = "state-avail";
       let actionHtml = "";
 
       if (r.status === "available") {
+        dotClass = "dot-avail";
         stateClass = "state-avail";
         actionHtml = `<button class="claim-link-btn" onclick="openClaimModal('${escapeHtml(data.subdomain)}', '${escapeHtml(r.zone)}')">Register &rarr;</button>`;
       } else if (r.status === "taken") {
+        dotClass = "dot-taken";
         stateClass = "state-taken";
-        actionHtml = `<span style="color: var(--text-muted); font-size: 0.82rem;">Registered</span>`;
+        actionHtml = `<span style="color: var(--text-muted); font-size: 0.82rem;">Taken</span>`;
       } else {
+        dotClass = "dot-reserved";
         stateClass = "state-reserved";
         actionHtml = `<span style="color: var(--text-muted); font-size: 0.82rem;">Reserved</span>`;
       }
@@ -109,7 +112,10 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="result-entry">
           <div>
             <div class="result-domain-line">${escapeHtml(r.fqdn)}</div>
-            <div class="result-state ${stateClass}">${escapeHtml(r.message)}</div>
+            <div class="result-state ${stateClass}">
+              <span class="dot ${dotClass}"></span>
+              <span>${escapeHtml(r.message)}</span>
+            </div>
           </div>
           <div>${actionHtml}</div>
         </div>
@@ -153,7 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (type === "CNAME") {
         if (recordTargetLabel) recordTargetLabel.innerText = "Target host";
         if (recordTargetInput) recordTargetInput.placeholder = "username.github.io";
-        if (recordTargetHint) recordTargetHint.innerText = "Hostname where traffic should be routed (must end with dot).";
+        if (recordTargetHint) recordTargetHint.innerText = "Hostname where traffic should be routed (must end with a dot).";
       } else if (type === "A") {
         if (recordTargetLabel) recordTargetLabel.innerText = "IPv4 address";
         if (recordTargetInput) recordTargetInput.placeholder = "185.12.34.56";
@@ -237,9 +243,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (data.nameservers && grid) {
         grid.innerHTML = data.nameservers.map(ns => `
           <div class="ns-row">
-            <span class="ns-name">${ns.host}.${data.primary_zone || "be-a.dev"}</span>
-            <span class="ns-ip">${ns.ip}</span>
-            <span class="ns-geo">${ns.region}</span>
+            <span class="ns-name">${escapeHtml(ns.host)}.${escapeHtml(data.primary_zone || "be-a.dev")}</span>
+            <span class="ns-ip">${escapeHtml(ns.ip)}</span>
+            <span class="ns-geo">${escapeHtml(ns.region)}</span>
           </div>
         `).join("");
       }
