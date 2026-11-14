@@ -26,8 +26,3 @@ jobs:
       - name: Compile Zones
         run: ./bin/registry compile --out-dir ./zones
 
-      - name: Upload Zone Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: compiled-zones
-          path: ./zones/
