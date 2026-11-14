@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const submitPrBtn = document.getElementById("submit-pr-btn");
   const copyDigBtn = document.getElementById("copy-dig-btn");
   const digCommand = document.getElementById("dig-command");
+  const expiryText = document.getElementById("expiry-text");
 
   let currentSubdomain = "";
   let currentZone = "be-a.dev";
@@ -24,12 +25,12 @@ document.addEventListener("DOMContentLoaded", () => {
     copyDigBtn.addEventListener("click", async () => {
       try {
         await navigator.clipboard.writeText(digCommand.innerText.trim());
-        copyDigBtn.innerText = "Copied!";
+        copyDigBtn.innerText = "copied!";
         setTimeout(() => {
-          copyDigBtn.innerText = "Copy";
+          copyDigBtn.innerText = "copy";
         }, 2000);
       } catch (err) {
-        console.warn("clipboard copy failed", err);
+        console.warn("copy failed", err);
       }
     });
   }
@@ -43,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
         resultsContainer.innerHTML = "";
         return;
       }
-      searchTimeout = setTimeout(() => performSearch(query), 200);
+      searchTimeout = setTimeout(() => performSearch(query), 180);
     });
 
     searchInput.addEventListener("keydown", (e) => {
@@ -69,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function performSearch(query) {
     if (!resultsContainer) return;
-    resultsContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem;">Checking availability...</p>`;
+    resultsContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem;">Checking availability...</p>`;
 
     try {
       const res = await fetch(`/api/check?name=${encodeURIComponent(query)}`);
@@ -77,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
       renderResults(data);
     } catch (err) {
-      resultsContainer.innerHTML = `<p style="color: var(--red); font-size: 0.9rem;">Failed to check availability. Please try again.</p>`;
+      resultsContainer.innerHTML = `<p style="color: var(--red); font-size: 0.85rem;">Failed to check availability.</p>`;
     }
   }
 
@@ -85,33 +86,30 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!resultsContainer) return;
 
     if (!data.results || data.results.length === 0) {
-      resultsContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem;">No results found for "${escapeHtml(data.subdomain || "")}"</p>`;
+      resultsContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem;">No results found.</p>`;
       return;
     }
 
     resultsContainer.innerHTML = data.results.map(r => {
-      let pillHtml = "";
+      let stateClass = "state-avail";
       let actionHtml = "";
 
       if (r.status === "available") {
-        pillHtml = `<span class="status-pill status-available">Available</span>`;
-        actionHtml = `<button class="btn btn-primary" onclick="openClaimModal('${escapeHtml(data.subdomain)}', '${escapeHtml(r.zone)}')">Claim</button>`;
+        stateClass = "state-avail";
+        actionHtml = `<button class="claim-link-btn" onclick="openClaimModal('${escapeHtml(data.subdomain)}', '${escapeHtml(r.zone)}')">Register &rarr;</button>`;
       } else if (r.status === "taken") {
-        pillHtml = `<span class="status-pill status-taken">Registered</span>`;
-        actionHtml = `<span style="color: var(--text-muted); font-size: 0.85rem;">Unavailable</span>`;
+        stateClass = "state-taken";
+        actionHtml = `<span style="color: var(--text-muted); font-size: 0.82rem;">Registered</span>`;
       } else {
-        pillHtml = `<span class="status-pill status-reserved">Reserved</span>`;
-        actionHtml = `<span style="color: var(--text-muted); font-size: 0.85rem;">Protected</span>`;
+        stateClass = "state-reserved";
+        actionHtml = `<span style="color: var(--text-muted); font-size: 0.82rem;">Reserved</span>`;
       }
 
       return `
-        <div class="result-card">
+        <div class="result-entry">
           <div>
-            <div style="display: flex; align-items: center; gap: 0.6rem;">
-              <span class="result-name">${escapeHtml(r.fqdn)}</span>
-              ${pillHtml}
-            </div>
-            <div class="result-meta">${escapeHtml(r.message)}</div>
+            <div class="result-domain-line">${escapeHtml(r.fqdn)}</div>
+            <div class="result-state ${stateClass}">${escapeHtml(r.message)}</div>
           </div>
           <div>${actionHtml}</div>
         </div>
@@ -153,21 +151,21 @@ document.addEventListener("DOMContentLoaded", () => {
     recordTypeSelect.addEventListener("change", () => {
       const type = recordTypeSelect.value;
       if (type === "CNAME") {
-        if (recordTargetLabel) recordTargetLabel.innerText = "Target Host";
-        if (recordTargetInput) recordTargetInput.placeholder = "octocat.github.io";
-        if (recordTargetHint) recordTargetHint.innerText = "Target hostname for GitHub Pages, Vercel, Fly.io, etc.";
+        if (recordTargetLabel) recordTargetLabel.innerText = "Target host";
+        if (recordTargetInput) recordTargetInput.placeholder = "username.github.io";
+        if (recordTargetHint) recordTargetHint.innerText = "Hostname where traffic should be routed (must end with dot).";
       } else if (type === "A") {
-        if (recordTargetLabel) recordTargetLabel.innerText = "IPv4 Address";
+        if (recordTargetLabel) recordTargetLabel.innerText = "IPv4 address";
         if (recordTargetInput) recordTargetInput.placeholder = "185.12.34.56";
-        if (recordTargetHint) recordTargetHint.innerText = "Dedicated VPS or server IPv4 address.";
+        if (recordTargetHint) recordTargetHint.innerText = "Direct server IPv4 address.";
       } else if (type === "AAAA") {
-        if (recordTargetLabel) recordTargetLabel.innerText = "IPv6 Address";
+        if (recordTargetLabel) recordTargetLabel.innerText = "IPv6 address";
         if (recordTargetInput) recordTargetInput.placeholder = "2a01:4f8:...";
         if (recordTargetHint) recordTargetHint.innerText = "Direct server IPv6 address.";
       } else if (type === "TXT") {
-        if (recordTargetLabel) recordTargetLabel.innerText = "TXT Value";
+        if (recordTargetLabel) recordTargetLabel.innerText = "TXT record";
         if (recordTargetInput) recordTargetInput.placeholder = "verification-string";
-        if (recordTargetHint) recordTargetHint.innerText = "Verification or configuration text.";
+        if (recordTargetHint) recordTargetHint.innerText = "Verification token or SPF text.";
       } else if (type === "NS") {
         if (recordTargetLabel) recordTargetLabel.innerText = "Nameservers (comma-separated)";
         if (recordTargetInput) recordTargetInput.placeholder = "ns1.he.net, ns2.he.net";
@@ -186,7 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const rawTarget = recordTargetInput ? recordTargetInput.value.trim() : "";
     const username = (githubUserInput ? githubUserInput.value.trim() : "") || "username";
 
-    let defaultTarget = "octocat.github.io";
+    let defaultTarget = "username.github.io";
     if (type === "A") defaultTarget = "185.12.34.56";
     if (type === "AAAA") defaultTarget = "2001:db8::1";
     if (type === "TXT") defaultTarget = "v=spf1 ~all";
@@ -238,29 +236,18 @@ document.addEventListener("DOMContentLoaded", () => {
       const grid = document.getElementById("status-grid");
       if (data.nameservers && grid) {
         grid.innerHTML = data.nameservers.map(ns => `
-          <tr>
-            <td><code>${ns.host}.${data.primary_zone || "be-a.dev"}</code></td>
-            <td><code>${ns.ip}</code></td>
-            <td>${ns.region}</td>
-            <td><span class="status-pill status-active">Active</span></td>
-          </tr>
+          <div class="ns-row">
+            <span class="ns-name">${ns.host}.${data.primary_zone || "be-a.dev"}</span>
+            <span class="ns-ip">${ns.ip}</span>
+            <span class="ns-geo">${ns.region}</span>
+          </div>
         `).join("");
       }
 
-      const expiryGrid = document.getElementById("expiry-grid");
-      if (data.expiry && expiryGrid) {
-        expiryGrid.innerHTML = data.expiry.map(e => {
-          const expDate = e.expires_at ? new Date(e.expires_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : "November 13, 2027";
-          return `
-            <div class="health-row">
-              <div>
-                <strong>${e.domain}</strong>
-                <div class="health-detail">Registered until ${expDate} via Google Registry</div>
-              </div>
-              <span class="status-pill status-active">${e.days_remaining} days remaining</span>
-            </div>
-          `;
-        }).join("");
+      if (data.expiry && data.expiry.length > 0 && expiryText) {
+        const rootExp = data.expiry[0];
+        const expDate = rootExp.expires_at ? new Date(rootExp.expires_at).toLocaleDateString("en-US", { month: "short", year: "numeric" }) : "Nov 2027";
+        expiryText.innerText = `registered through ${expDate} (${rootExp.days_remaining} days left)`;
       }
     } catch (e) {
       console.warn("Status fetch failed", e);
