@@ -3,32 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{.Subdomain}}.{{.Zone}} // available</title>
+  <title>{{.Subdomain}}.{{.Zone}} &mdash; Available Subdomain</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/style.css">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
 </head>
 <body>
-  <div class="shell">
+  <div class="container">
     <div class="fallback-box">
-      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">[unclaimed subdomain]</p>
+      <span class="status-pill status-available" style="margin-bottom: 1.25rem;">Available Subdomain</span>
       <h1><span>{{.Subdomain}}</span>.{{.Zone}}</h1>
-      <p>This subdomain is currently unallocated and free to register via GitOps.</p>
+      <p>This subdomain is currently unallocated and ready to be claimed for free via GitOps.</p>
 
-      <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+      <div class="fallback-actions">
         <a href="https://github.com/xdearboy/be-a.dev/new/main?filename=domains/{{.Zone}}/{{.Shard}}/{{.Subdomain}}.json"
-           target="_blank" rel="noopener" class="btn" style="background: var(--accent); color: #11111b; font-weight: 600;">
-          claim {{.Subdomain}}.{{.Zone}} via github &rarr;
+           target="_blank" rel="noopener" class="btn btn-primary">
+          Claim {{.Subdomain}}.{{.Zone}} on GitHub
         </a>
-        <a href="https://be-a.dev" class="btn">
-          search other handles
+        <a href="https://be-a.dev" class="btn btn-secondary">
+          Search Other Subdomains
         </a>
-      </div>
-
-      <div style="margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1rem; font-size: 0.78rem; color: var(--text-muted);">
-        be-a.dev &bull; authoritative coredns 1.12 &bull; <a href="https://github.com/xdearboy/be-a.dev" target="_blank" rel="noopener">[github]</a>
       </div>
     </div>
   </div>
