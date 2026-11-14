@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "FreeSubdomainDefinition",
-  "description": "Definition file for free subdomains under kra67.space and plmt.tech",
+  "title": "BeADevSubdomainDefinition",
+  "description": "Definition schema for subdomains under be-a.dev",
   "type": "object",
   "required": ["owner", "records"],
   "properties": {

@@ -4,32 +4,48 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Subdomain Available &bull; {{.Subdomain}}.{{.Zone}}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
 </head>
-<body style="justify-content: center; align-items: center; text-align: center;">
-  <div class="gradient-mesh"></div>
+<body class="fallback-body">
+  <div class="ambient-glow"></div>
+  <div class="grid-overlay"></div>
 
-  <div class="container" style="max-width: 640px; padding: 3rem 1.5rem;">
-    <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 20px; padding: 3rem 2rem; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);">
-      <div style="font-size: 3.5rem; margin-bottom: 1rem;">🎉</div>
-      <div class="hero-tag" style="margin-bottom: 1rem;">Available Domain</div>
-      <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 0.75rem; word-break: break-all;">
-        <span class="gradient-text">{{.Subdomain}}</span>.{{.Zone}}
+  <main class="container fallback-container">
+    <div class="fallback-card">
+      <div class="fallback-badge">
+        <span class="status-pulse"></span>
+        <span>Wildcard Fallback Route</span>
+      </div>
+
+      <h1 class="fallback-title">
+        <span class="gradient-text">{{.Subdomain}}</span><span class="fallback-zone">.{{.Zone}}</span>
       </h1>
-      <p style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 2rem;">
-        This subdomain is currently unallocated and ready to be claimed for your personal project, blog, or bot.
+
+      <p class="fallback-desc">
+        This subdomain is currently unallocated and instantly claimable for your personal website, GitHub Pages, blog, or API gateway.
       </p>
 
-      <a href="https://github.com/xdearboy/free-domains/new/main?filename=domains/{{.Zone}}/{{.Shard}}/{{.Subdomain}}.json" 
-         target="_blank" class="claim-btn" style="font-size: 1.1rem; padding: 1rem 2rem; display: inline-block;">
-        🚀 Claim {{.Subdomain}}.{{.Zone}} for Free
-      </a>
+      <div class="fallback-actions">
+        <a href="https://github.com/xdearboy/be-a.dev/new/main?filename=domains/{{.Zone}}/{{.Shard}}/{{.Subdomain}}.json"
+           target="_blank" rel="noopener" class="primary-btn fallback-btn">
+          <span>Claim {{.Subdomain}}.{{.Zone}} via GitHub</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        </a>
+        <a href="https://be-a.dev" class="secondary-btn fallback-home-btn">
+          <span>Search Other Handles</span>
+        </a>
+      </div>
 
-      <div style="margin-top: 2.5rem; border-top: 1px solid var(--border-color); pt-3; font-size: 0.85rem; color: var(--text-muted); padding-top: 1.5rem;">
-        Powered by FreeDomains Authoritative CoreDNS Stack &bull; <a href="https://github.com/xdearboy/free-domains" style="color: var(--accent-cyan); text-decoration: none;">View Registry</a>
+      <div class="fallback-footer">
+        <span>Powered by <strong>be-a.dev</strong> Authoritative CoreDNS Stack</span>
+        &bull;
+        <a href="https://github.com/xdearboy/be-a.dev" target="_blank" rel="noopener">GitOps Registry</a>
       </div>
     </div>
-  </div>
+  </main>
 </body>
 </html>

@@ -1,35 +1,47 @@
-# FreeDomains Registry 🌐
+# be-a.dev ⚡
 
-[![RFC Compliance](https://img.shields.io/badge/RFC-1035%20%7C%201982%20%7C%202308%20%7C%208482-06b6d4)](https://www.ietf.org/standards/rfcs/)
-[![Go Version](https://img.shields.io/badge/Go-1.26+-3b82f6.svg)](https://golang.org)
-[![CoreDNS](https://img.shields.io/badge/DNS-CoreDNS%20Authoritative-8b5cf6)](https://coredns.io)
+[![be-a.dev Status](https://img.shields.io/badge/status-active-10b981?style=flat-square)](https://be-a.dev)
+[![Go Version](https://img.shields.io/badge/go-1.26+-06b6d4?style=flat-square&logo=go)](https://golang.org)
+[![CoreDNS](https://img.shields.io/badge/dns-CoreDNS%201.12-8b5cf6?style=flat-square)](https://coredns.io)
+[![RFC Compliant](https://img.shields.io/badge/rfc-1035%20%7C%201982%20%7C%202308-3b82f6?style=flat-square)](https://www.ietf.org/standards/rfcs/)
+[![License](https://img.shields.io/badge/license-MIT-gray?style=flat-square)](LICENSE)
 
-Open-source, GitOps-driven free subdomain registry for developers and creators. Get your free subdomain under **`kra67.space`** or **`plmt.tech`** powered by a high-performance authoritative CoreDNS cluster distributed across European datacenters.
+> Minimal, ultra-fast, and free subdomains for developers and makers.  
+> Powered by GitOps, RFC-compliant DNS, and an authoritative CoreDNS cluster distributed across Europe.
+
+🌐 **Web Portal & Live Search:** [https://be-a.dev](https://be-a.dev)
 
 ---
 
-## 🚀 How to Claim a Free Subdomain
+```
+$ dig +noall +answer d3vo.be-a.dev @ns1.be-a.dev
+d3vo.be-a.dev.        300    IN    CNAME    d3vo.ru.
+```
 
-### Method 1: Web Portal (1-Click PR)
-1. Open the [FreeDomains Web Portal](http://localhost:8080) (or visit your production URL).
-2. Enter your desired subdomain in the search bar.
-3. If available, click **Claim**, fill in your GitHub username and target CNAME or IP.
-4. Click **🚀 Open GitHub Pull Request** — GitHub opens a pre-filled PR ready to submit!
+---
 
-### Method 2: Manual Pull Request
-Fork this repository and add your domain JSON definition following 1-character sharding:
+## ⚡ Quickstart: Claim Your Subdomain
+
+### Option A: 1-Click via Web Portal (Recommended)
+1. Open the [be-a.dev Web Portal](https://be-a.dev).
+2. Enter your handle or project name (e.g. `alex`, `my-bot`, `api`).
+3. Click **Claim Subdomain**, fill in your GitHub username and target host.
+4. Click **🚀 Open GitHub Pull Request** — GitHub opens a pre-filled PR ready to merge.
+
+### Option B: GitOps Pull Request
+Fork this repository and add your domain JSON definition following single-character sharding:
 `domains/<zone>/<first-letter>/<subdomain>.json`
 
-**Example: `domains/kra67.space/a/alice.json`:**
+**Example: `domains/be-a.dev/a/alex.json`:**
 ```json
 {
   "$schema": "../../../schemas/domain.schema.json",
-  "description": "Alice's personal dev blog and API",
+  "description": "Alex's personal portfolio & blog",
   "owner": {
-    "username": "alice"
+    "username": "alex"
   },
   "records": {
-    "CNAME": "alice.github.io."
+    "CNAME": "alex.github.io."
   },
   "ttl": 300
 }
@@ -37,55 +49,65 @@ Fork this repository and add your domain JSON definition following 1-character s
 
 ---
 
-## 📜 Supported Records & RFC Rules
+## 📋 Supported Records & Validation Rules
 
-| Type | Description | RFC Rules |
+| Record | Purpose | Constraints & Security |
 | :--- | :--- | :--- |
-| **`CNAME`** | Alias to external host (GitHub Pages, Vercel) | **Exclusive:** Cannot coexist with A, AAAA, TXT or NS (RFC 1034 §3.6.2). Trailing dot normalized. |
-| **`A`** | IPv4 address | Public IPv4 only. Private & loopback subnets blocked (RFC 1918). |
-| **`AAAA`** | IPv6 address | Public IPv6 only. Loopback `::1` and link-local blocked. |
-| **`TXT`** | Verification tokens (Google, etc.) | Maximum 255 characters per string. |
+| **`CNAME`** | GitHub Pages, Vercel, Cloudflare, Fly.io | **Exclusive:** Cannot coexist with A, AAAA or NS (RFC 1034 §3.6.2). Trailing dot normalized. |
+| **`A`** | Dedicated server / VPS IPv4 | Public IPv4 only. Private ranges (RFC 1918 `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) and loopback blocked. |
+| **`AAAA`** | VPS / Edge IPv6 | Public IPv6 only. Loopback `::1` and link-local `fe80::/10` blocked. |
+| **`TXT`** | Domain verification (Google, Bluesky, etc.) | Max 255 characters per string. Coexists with A/AAAA. |
 | **`NS`** | Subzone delegation | Minimum 2 nameservers (RFC 2182). Out-of-bailiwick only. |
-| **`_acme-challenge`** | Let's Encrypt SSL verification token | Permitted alongside CNAME for automated Wildcard SSL (RFC 8555). |
+| **`_acme-challenge`** | Let's Encrypt automated SSL validation | Permitted alongside CNAME for automatic Wildcard TLS (RFC 8555). |
 
 ---
 
-## 🏛️ Authoritative Nameserver Cluster
+## 🏛️ Authoritative Geo-DNS Cluster
 
-The zones are served directly by an authoritative CoreDNS DaemonSet distributed across European nodes:
+Our DNS records are served directly by an authoritative CoreDNS DaemonSet bound to public edge nodes:
 
-* 🇳🇱 **ns1.kra67.space** (`130.78.191.155` - Netherlands)
-* 🇩🇪 **ns2.kra67.space** (`191.44.118.80` - Germany)
-* 🇵🇱 **ns3.kra67.space** (`222.167.248.169` - Poland)
+| Nameserver | Location | IPv4 Address | Latency |
+| :--- | :--- | :--- | :--- |
+| **`ns1.be-a.dev`** | 🇳🇱 Amsterdam, Netherlands | `130.78.191.155` | `<10ms` (EU West) |
+| **`ns2.be-a.dev`** | 🇩🇪 Frankfurt, Germany | `191.44.118.80` | `<12ms` (EU Central) |
+| **`ns3.be-a.dev`** | 🇵🇱 Warsaw, Poland | `222.167.248.169` | `<8ms` (EU East) |
 
-### ✨ CoreDNS Highlights:
-* **RFC 1982:** Incremental serial arithmetic (`YYYYMMDDnn`).
-* **RFC 2308:** 5-minute negative caching TTL (`300s`) so freshly created domains resolve globally without 24h caching delays.
-* **RFC 8482:** Mitigation against DNS amplification DDoS attacks on `ANY` queries (`minimal-any`).
-* **Catch-All Wildcard Fallback:** Any unallocated subdomain queries resolve to the web portal landing page inviting visitors to claim the name.
+### Engineering Highlights
+* **RFC 1982:** Monotonic serial formatting (`YYYYMMDDnn`) updated on every merge.
+* **RFC 2308:** 300-second negative caching TTL ensures newly claimed subdomains propagate globally within 5 minutes.
+* **Wildcard Fallback:** Any unregistered query resolves to the portal, allowing visitors to instantly claim unclaimed names.
+* **Automated RDAP Monitoring:** Daily health checks on root domain expiration with Prometheus metrics exports.
 
 ---
 
-## 🛠️ CLI Tooling
+## 🛠️ Local CLI Tooling
 
-The repository includes a unified Go binary (`cmd/registry`):
+The registry is managed via a zero-dependency Go CLI tool:
 
 ```bash
-# 1. Validate all definitions against RFC standards & blacklists
-./bin/registry validate
+# Validate domain definitions against RFC rules and reserved stoplists
+go run ./cmd/registry validate
 
-# 2. Compile JSON files into RFC 1035 BIND zone files
-./bin/registry compile --out-dir ./zones
+# Compile all JSON records into RFC 1035 BIND zone files
+go run ./cmd/registry compile --out-dir ./zones
 
-# 3. Start the Web Portal, Live Search API & Fallback server
-./bin/registry serve --addr :8080
+# Run the web portal & live search server locally
+go run ./cmd/registry serve --addr :8080
+
+# Check live domain expiration via RDAP
+go run ./cmd/registry expiry
 ```
 
 ---
 
-## 🧪 Testing
+## 🧪 Automated Testing
 
 ```bash
-# Run unit & integration tests
-go test -v ./...
+go test -v -count=1 ./...
 ```
+
+---
+
+## 📄 License
+
+MIT © 2026 [xdearboy](https://github.com/xdearboy). Free for open-source and individual developers.

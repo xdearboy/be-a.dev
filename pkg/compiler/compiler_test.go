@@ -23,7 +23,7 @@ func TestCompilerGeneration(t *testing.T) {
 	configs := []*models.DomainConfig{
 		{
 			Subdomain: "alice",
-			Zone:      "kra67.space",
+			Zone:      "be-a.dev",
 			Owner:     models.Owner{Username: "alice"},
 			Records: models.RecordSet{
 				CNAME:         "alice.github.io",
@@ -33,7 +33,7 @@ func TestCompilerGeneration(t *testing.T) {
 		},
 		{
 			Subdomain: "demo",
-			Zone:      "kra67.space",
+			Zone:      "be-a.dev",
 			Owner:     models.Owner{Username: "demo"},
 			Records: models.RecordSet{
 				A:    []string{"185.12.34.56"},
@@ -44,7 +44,7 @@ func TestCompilerGeneration(t *testing.T) {
 		},
 		{
 			Subdomain: "sub",
-			Zone:      "kra67.space",
+			Zone:      "be-a.dev",
 			Owner:     models.Owner{Username: "subuser"},
 			Records: models.RecordSet{
 				NS: []string{"ns1.he.net", "ns2.he.net"},
@@ -53,7 +53,7 @@ func TestCompilerGeneration(t *testing.T) {
 		},
 	}
 
-	zoneText, err := comp.GenerateZone("kra67.space", configs)
+	zoneText, err := comp.GenerateZone("be-a.dev", configs)
 	if err != nil {
 		t.Fatalf("failed to generate zone: %v", err)
 	}
@@ -62,18 +62,18 @@ func TestCompilerGeneration(t *testing.T) {
 	if !strings.Contains(zoneText, "SOA") {
 		t.Errorf("zone text missing SOA record")
 	}
-	if !strings.Contains(zoneText, "ns1.kra67.space.") {
+	if !strings.Contains(zoneText, "ns1.be-a.dev.") {
 		t.Errorf("zone text missing primary NS record")
 	}
-	if !strings.Contains(zoneText, "alice.kra67.space.	300	IN	CNAME	alice.github.io.") {
+	if !strings.Contains(zoneText, "alice.be-a.dev.	300	IN	CNAME	alice.github.io.") {
 		t.Errorf("zone text missing alice CNAME record with trailing dot, got:\n%s", zoneText)
 	}
-	if !strings.Contains(zoneText, "_acme-challenge.alice.kra67.space.	60	IN	TXT	\"token-123456\"") {
+	if !strings.Contains(zoneText, "_acme-challenge.alice.be-a.dev.	60	IN	TXT	\"token-123456\"") {
 		t.Errorf("zone text missing _acme-challenge TXT record, got:\n%s", zoneText)
 	}
 
 	// Verify using miekg/dns parser
-	if err := comp.VerifyZone("kra67.space", zoneText); err != nil {
+	if err := comp.VerifyZone("be-a.dev", zoneText); err != nil {
 		t.Fatalf("zone verification failed: %v", err)
 	}
 }
@@ -99,7 +99,7 @@ func TestCompileDirectory(t *testing.T) {
 		t.Errorf("expected at least 1 zone compiled, got 0")
 	}
 
-	if count, ok := results["kra67.space"]; !ok || count < 2 {
-		t.Errorf("expected kra67.space to have at least 2 domains, got %d", count)
+	if count, ok := results["be-a.dev"]; !ok || count < 2 {
+		t.Errorf("expected be-a.dev to have at least 2 domains, got %d", count)
 	}
 }

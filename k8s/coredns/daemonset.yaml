@@ -16,27 +16,6 @@ data:
         prometheus :9153
         cache 300
     }
-
-    kra67.space:53 {
-        log
-        errors
-        file /etc/coredns/zones/db.kra67.space {
-            reload 5s
-        }
-        prometheus :9153
-        cache 300
-    }
-
-    plmt.tech:53 {
-        log
-        errors
-        file /etc/coredns/zones/db.plmt.tech {
-            reload 5s
-        }
-        prometheus :9153
-        cache 300
-    }
-
 ---
 apiVersion: apps/v1
 kind: DaemonSet

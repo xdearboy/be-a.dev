@@ -76,7 +76,7 @@ func NewServer(domainsDir string, v *validator.Validator) (*Server, error) {
 	return &Server{
 		domainsDir:    domainsDir,
 		validator:     v,
-		primaryZones:  []string{"be-a.dev", "kra67.space", "plmt.tech"},
+		primaryZones:  []string{"be-a.dev"},
 		fallbackTmpl:  tmpl,
 		expiryChecker: expiry.NewChecker(6 * time.Hour),
 	}, nil

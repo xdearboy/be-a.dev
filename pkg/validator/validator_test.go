@@ -30,7 +30,7 @@ func TestValidConfigs(t *testing.T) {
 			name: "Valid CNAME with ACME challenge",
 			config: models.DomainConfig{
 				Subdomain: "alice",
-				Zone:      "kra67.space",
+				Zone:      "be-a.dev",
 				Owner: models.Owner{
 					Username: "alice",
 				},
@@ -45,7 +45,7 @@ func TestValidConfigs(t *testing.T) {
 			name: "Valid A and AAAA records",
 			config: models.DomainConfig{
 				Subdomain: "my-app",
-				Zone:      "kra67.space",
+				Zone:      "be-a.dev",
 				Owner: models.Owner{
 					Username: "my-user",
 				},
@@ -101,7 +101,7 @@ func TestRFC1035SyntaxViolations(t *testing.T) {
 		t.Run(tc.reason, func(t *testing.T) {
 			cfg := &models.DomainConfig{
 				Subdomain: tc.subdomain,
-				Zone:      "kra67.space",
+				Zone:      "be-a.dev",
 				Owner:     models.Owner{Username: "test"},
 				Records:   models.RecordSet{A: []string{"185.1.2.3"}},
 			}
@@ -117,7 +117,7 @@ func TestCNAMEExclusivityRule(t *testing.T) {
 
 	cfg := &models.DomainConfig{
 		Subdomain: "conflict",
-		Zone:      "kra67.space",
+		Zone:      "be-a.dev",
 		Owner:     models.Owner{Username: "test"},
 		Records: models.RecordSet{
 			CNAME: "target.example.com.",
@@ -147,7 +147,7 @@ func TestAntiSpoofingPrivateIP(t *testing.T) {
 		t.Run(ip, func(t *testing.T) {
 			cfg := &models.DomainConfig{
 				Subdomain: "spoof-test",
-				Zone:      "kra67.space",
+				Zone:      "be-a.dev",
 				Owner:     models.Owner{Username: "test"},
 				Records: models.RecordSet{
 					A: []string{ip},
@@ -167,11 +167,11 @@ func TestBlacklistAndReserved(t *testing.T) {
 		subdomain string
 		zone      string
 	}{
-		{"admin", "kra67.space"},
-		{"sberbank", "kra67.space"},
-		{"login-verify", "kra67.space"},
-		{"highlight", "plmt.tech"},     // Reserved on plmt.tech
-		{"dontusetelega", "plmt.tech"}, // Reserved on plmt.tech
+		{"admin", "be-a.dev"},
+		{"sberbank", "be-a.dev"},
+		{"login-verify", "be-a.dev"},
+		{"api", "be-a.dev"},
+		{"auth", "be-a.dev"},
 	}
 
 	for _, tc := range blockedNames {
@@ -195,7 +195,7 @@ func TestNSDelegationRules(t *testing.T) {
 	// Test < 2 nameservers
 	cfgSingleNS := &models.DomainConfig{
 		Subdomain: "sub",
-		Zone:      "kra67.space",
+		Zone:      "be-a.dev",
 		Owner:     models.Owner{Username: "test"},
 		Records: models.RecordSet{
 			NS: []string{"ns1.example.com."},
@@ -208,10 +208,10 @@ func TestNSDelegationRules(t *testing.T) {
 	// Test in-bailiwick loop
 	cfgInBailiwick := &models.DomainConfig{
 		Subdomain: "sub",
-		Zone:      "kra67.space",
+		Zone:      "be-a.dev",
 		Owner:     models.Owner{Username: "test"},
 		Records: models.RecordSet{
-			NS: []string{"ns1.sub.kra67.space.", "ns2.sub.kra67.space."},
+			NS: []string{"ns1.sub.be-a.dev.", "ns2.sub.be-a.dev."},
 		},
 	}
 	if err := v.ValidateConfig(cfgInBailiwick, "test"); err == nil {
@@ -224,7 +224,7 @@ func TestImpersonationProtection(t *testing.T) {
 
 	cfg := &models.DomainConfig{
 		Subdomain: "victim",
-		Zone:      "kra67.space",
+		Zone:      "be-a.dev",
 		Owner:     models.Owner{Username: "legit-user"},
 		Records:   models.RecordSet{A: []string{"185.1.2.3"}},
 	}

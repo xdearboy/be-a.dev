@@ -41,8 +41,8 @@ func TestIndexPage(t *testing.T) {
 	}
 
 	body := w.Body.String()
-	if !strings.Contains(body, "Free Subdomains for") {
-		t.Errorf("index page missing hero title")
+	if !strings.Contains(body, "be-a.dev") {
+		t.Errorf("index page missing be-a.dev branding")
 	}
 }
 
@@ -51,7 +51,7 @@ func TestWildcardFallback(t *testing.T) {
 
 	// Simulate requesting an unallocated domain
 	req := httptest.NewRequest("GET", "/", nil)
-	req.Host = "unallocated-project-99.kra67.space"
+	req.Host = "unallocated-project-99.be-a.dev"
 	w := httptest.NewRecorder()
 
 	srv.Handler().ServeHTTP(w, req)
@@ -61,7 +61,7 @@ func TestWildcardFallback(t *testing.T) {
 	}
 
 	body := w.Body.String()
-	if !strings.Contains(body, "unallocated-project-99") || !strings.Contains(body, "kra67.space") {
+	if !strings.Contains(body, "unallocated-project-99") || !strings.Contains(body, "be-a.dev") {
 		t.Errorf("fallback page did not render domain name correctly, got:\n%s", body)
 	}
 }
@@ -76,34 +76,30 @@ func TestCheckAPI(t *testing.T) {
 	}{
 		{
 			name:  "Existing domain",
-			query: "alice",
+			query: "d3vo",
 			expectedStatus: map[string]string{
-				"kra67.space": "taken",
-				"plmt.tech":   "available",
+				"be-a.dev": "taken",
 			},
 		},
 		{
 			name:  "Available domain",
 			query: "my-brandnew-app",
 			expectedStatus: map[string]string{
-				"kra67.space": "available",
-				"plmt.tech":   "available",
+				"be-a.dev": "available",
 			},
 		},
 		{
 			name:  "Blacklisted domain",
 			query: "sberbank",
 			expectedStatus: map[string]string{
-				"kra67.space": "blacklisted",
-				"plmt.tech":   "blacklisted",
+				"be-a.dev": "blacklisted",
 			},
 		},
 		{
-			name:  "Reserved domain on plmt.tech",
-			query: "highlight",
+			name:  "Reserved domain on be-a.dev",
+			query: "dashboard",
 			expectedStatus: map[string]string{
-				"kra67.space": "available",
-				"plmt.tech":   "reserved",
+				"be-a.dev": "reserved",
 			},
 		},
 	}

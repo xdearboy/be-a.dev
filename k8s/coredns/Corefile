@@ -1,32 +1,10 @@
 # Authoritative CoreDNS configuration for be-a.dev registry
-# RFC 1035, RFC 1982, RFC 2308, RFC 8482 compliant
+# RFC 1035, RFC 1982, RFC 2308 compliant
 
 be-a.dev:53 {
     log
     errors
     file /etc/coredns/zones/db.be-a.dev {
-        reload 5s
-    }
-    prometheus :9153
-    health :8082
-    cache 300
-}
-
-kra67.space:53 {
-    log
-    errors
-    file /etc/coredns/zones/db.kra67.space {
-        reload 5s
-    }
-    prometheus :9153
-    health :8082
-    cache 300
-}
-
-plmt.tech:53 {
-    log
-    errors
-    file /etc/coredns/zones/db.plmt.tech {
         reload 5s
     }
     prometheus :9153
