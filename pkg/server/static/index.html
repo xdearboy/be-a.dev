@@ -3,220 +3,196 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>be-a.dev &bull; Clean & Free Subdomains for Developers</title>
-  <meta name="description" content="Get an instant, aesthetic *.be-a.dev subdomain for your blog, portfolio, or API. 100% free, GitOps-driven, authoritative CoreDNS.">
+  <title>be-a.dev // free developer subdomains</title>
+  <meta name="description" content="Free, clean *.be-a.dev subdomains for developers. GitOps-driven, authoritative CoreDNS, zero telemetry.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
 </head>
 <body>
-  <div class="ambient-glow"></div>
-  <div class="grid-overlay"></div>
+  <div class="shell">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-main">
+        <h1 class="site-title">
+          <a href="/">be-a.dev</a>
+          <span class="site-sub">{'// free developer subdomains'}<span class="cursor">_</span></span>
+        </h1>
+        <p class="site-desc">authoritative coredns 1.12 &bull; gitops-driven &bull; free forever</p>
+      </div>
+      <nav class="nav-links">
+        <a href="#how">how-it-works</a>
+        <a href="#nodes">nodes</a>
+        <a href="#health">health</a>
+        <a href="https://github.com/xdearboy/be-a.dev" target="_blank" rel="noopener">[github]</a>
+      </nav>
+    </header>
 
-  <header>
-    <div class="container nav-bar">
-      <a href="/" class="brand">
-        <span class="brand-logo">⚡</span>
-        <span class="brand-text">be-a<span class="brand-tld">.dev</span></span>
-        <span class="brand-tag">Registry</span>
-      </a>
-      <div class="nav-links">
-        <a href="#how-it-works">How It Works</a>
-        <a href="#cluster">Geo-DNS Nodes</a>
-        <a href="#expiry">Domain Health</a>
-        <a href="https://github.com/xdearboy/be-a.dev" target="_blank" rel="noopener" class="gh-nav-btn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-          GitHub
+    <hr class="divider">
+
+    <!-- Search Section -->
+    <main>
+      <section class="section">
+        <p class="prompt-text">find and claim your subdomain via gitops:</p>
+        <div class="search-box">
+          <span class="prompt-symbol">$</span>
+          <span class="search-label">register</span>
+          <input type="text" id="search-input" placeholder="handle" autocomplete="off" spellcheck="false" autofocus>
+          <span class="search-suffix">.be-a.dev</span>
+          <button id="search-btn" class="btn">check</button>
+        </div>
+        <div id="results-container" class="results-container"></div>
+      </section>
+
+      <section class="section">
+        <div class="code-block">
+          <div class="code-header">
+            <span>geo-dns test query</span>
+            <button id="copy-dig-btn" class="copy-btn">[copy]</button>
+          </div>
+          <code id="dig-command">dig @ns1.be-a.dev d3vo.be-a.dev +noall +answer</code>
+        </div>
+      </section>
+
+      <hr class="divider">
+
+      <!-- How it works -->
+      <section id="how" class="section">
+        <h2 class="section-title">### how it works</h2>
+        <div class="steps-list">
+          <div class="step-item">
+            <span class="step-idx">01.</span>
+            <div class="step-content">
+              <strong>Check Availability</strong> &mdash; pick an unallocated handle (1-63 chars, RFC 1035 compliant).
+            </div>
+          </div>
+          <div class="step-item">
+            <span class="step-idx">02.</span>
+            <div class="step-content">
+              <strong>Submit GitHub PR</strong> &mdash; click claim to open a pre-filled PR under <code>domains/be-a.dev/&lt;shard&gt;/&lt;handle&gt;.json</code>.
+            </div>
+          </div>
+          <div class="step-item">
+            <span class="step-idx">03.</span>
+            <div class="step-content">
+              <strong>Automatic Sync</strong> &mdash; once merged, CI compiles RFC 1035 zone and updates CoreDNS edge nodes in &lt;5s.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <hr class="divider">
+
+      <!-- Cluster Nodes -->
+      <section id="nodes" class="section">
+        <h2 class="section-title">### authoritative geo-dns cluster</h2>
+        <div class="table-wrapper">
+          <table class="nodes-table">
+            <thead>
+              <tr>
+                <th>host</th>
+                <th>ip</th>
+                <th>region</th>
+                <th>status</th>
+              </tr>
+            </thead>
+            <tbody id="status-grid">
+              <tr>
+                <td>ns1.be-a.dev</td>
+                <td>130.78.191.155</td>
+                <td>Netherlands (NL)</td>
+                <td><span class="tag-ok">active</span></td>
+              </tr>
+              <tr>
+                <td>ns2.be-a.dev</td>
+                <td>191.44.118.80</td>
+                <td>Germany (DE)</td>
+                <td><span class="tag-ok">active</span></td>
+              </tr>
+              <tr>
+                <td>ns3.be-a.dev</td>
+                <td>222.167.248.169</td>
+                <td>Poland (PL)</td>
+                <td><span class="tag-ok">active</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <hr class="divider">
+
+      <!-- Root Health -->
+      <section id="health" class="section">
+        <h2 class="section-title">### domain health &amp; transparency</h2>
+        <div id="expiry-grid" class="health-block">
+          <div class="health-line">
+            <span class="health-domain">be-a.dev</span>
+            <span class="health-days">364 days remaining</span>
+            <span class="health-meta">expires 2027-11-13 &bull; google registry (rdap verified)</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Claim Modal -->
+    <div id="claim-modal" class="modal-backdrop">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3>[claim] <span id="modal-domain-title">name.be-a.dev</span></h3>
+          <button id="modal-close" class="modal-close-btn">&times;</button>
+        </div>
+        <p class="modal-desc">Configure record target. A pre-filled PR will open on GitHub.</p>
+
+        <div class="form-group">
+          <label for="github-username">github username:</label>
+          <input type="text" id="github-username" placeholder="your-handle" autocomplete="off">
+        </div>
+
+        <div class="form-group">
+          <label for="record-type">record type:</label>
+          <select id="record-type">
+            <option value="CNAME">CNAME &mdash; GitHub Pages, Vercel, Fly.io, Cloudflare</option>
+            <option value="A">A &mdash; IPv4 Address</option>
+            <option value="AAAA">AAAA &mdash; IPv6 Address</option>
+            <option value="TXT">TXT &mdash; Verification</option>
+            <option value="NS">NS &mdash; Delegate Nameservers</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="record-target" id="record-target-label">target:</label>
+          <input type="text" id="record-target" placeholder="username.github.io">
+          <span id="record-target-hint" class="hint">Target FQDN for GitHub Pages, Vercel, Fly.io, etc.</span>
+        </div>
+
+        <div class="form-group">
+          <label>json definition:</label>
+          <pre id="json-preview" class="json-box"></pre>
+        </div>
+
+        <a id="submit-pr-btn" href="#" target="_blank" rel="noopener" class="btn btn-submit">
+          open pull request on github &rarr;
         </a>
       </div>
     </div>
-  </header>
 
-  <main class="container">
-    <section class="hero">
-      <div class="pill-badge">
-        <span class="status-pulse"></span>
-        <span>Authoritative CoreDNS 1.12 &bull; GitOps Driven</span>
-      </div>
-      <h1>Subdomains that look <br><span class="gradient-text">made for developers.</span></h1>
-      <p class="hero-desc">
-        Stop using messy, auto-generated URLs. Claim your free, clean <strong>[name].be-a.dev</strong> subdomain in seconds via GitHub Pull Requests.
-      </p>
+    <hr class="divider">
 
-      <div class="search-card">
-        <div class="search-input-wrapper">
-          <span class="search-prefix">https://</span>
-          <input type="text" id="search-input" placeholder="your-handle" autocomplete="off" spellcheck="false" autofocus>
-          <span class="search-suffix">.be-a.dev</span>
-          <button id="search-btn" class="primary-btn">
-            <span>Check</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </button>
-        </div>
-        <div id="results-container" class="results-container"></div>
-      </div>
-
-      <div class="quick-terminal">
-        <div class="terminal-header">
-          <div class="terminal-dots">
-            <span></span><span></span><span></span>
-          </div>
-          <span class="terminal-title">Query Geo-DNS</span>
-          <button id="copy-dig-btn" class="copy-btn" title="Copy to clipboard">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-            <span id="copy-dig-text">Copy</span>
-          </button>
-        </div>
-        <code id="dig-command">dig @ns1.be-a.dev d3vo.be-a.dev +noall +answer</code>
-      </div>
-    </section>
-
-    <!-- How It Works Section -->
-    <section id="how-it-works" class="section-container">
-      <div class="section-header">
-        <div class="pill-badge-sub">Simplicity First</div>
-        <h2>Claim in 3 Simple Steps</h2>
-      </div>
-      <div class="steps-grid">
-        <div class="step-card">
-          <div class="step-num">01</div>
-          <h3>Pick a Subdomain</h3>
-          <p>Search for your personal handle, project name, or API. Validation checks RFC 1035 syntax and reserved lists in real-time.</p>
-        </div>
-        <div class="step-card">
-          <div class="step-num">02</div>
-          <h3>1-Click GitHub PR</h3>
-          <p>Fill in your GitHub username and target host. Our portal constructs the JSON record and opens a pre-filled PR ready to submit.</p>
-        </div>
-        <div class="step-card">
-          <div class="step-num">03</div>
-          <h3>Instant Global Sync</h3>
-          <p>Once merged, our in-cluster GitOps engine compiles RFC 1035 BIND zones and hot-reloads CoreDNS across European edge nodes in &lt;5s.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Geo-DNS Cluster Status -->
-    <section id="cluster" class="section-container">
-      <div class="section-header">
-        <div class="pill-badge-sub">High Availability</div>
-        <h2>Authoritative Geo-DNS Cluster</h2>
-        <p class="section-desc">Served directly by CoreDNS DaemonSets on public edge servers with 300s negative caching.</p>
-      </div>
-      <div id="status-grid" class="cards-grid">
-        <div class="node-card">
-          <div class="node-top">
-            <div class="node-host"><span class="flag">🇳🇱</span> ns1.be-a.dev</div>
-            <span class="live-indicator"><span class="live-dot"></span> Active</span>
-          </div>
-          <div class="node-ip">130.78.191.155</div>
-          <div class="node-meta">Amsterdam, Netherlands &bull; Edge Gateway</div>
-        </div>
-        <div class="node-card">
-          <div class="node-top">
-            <div class="node-host"><span class="flag">🇩🇪</span> ns2.be-a.dev</div>
-            <span class="live-indicator"><span class="live-dot"></span> Active</span>
-          </div>
-          <div class="node-ip">191.44.118.80</div>
-          <div class="node-meta">Frankfurt, Germany &bull; Edge Gateway</div>
-        </div>
-        <div class="node-card">
-          <div class="node-top">
-            <div class="node-host"><span class="flag">🇵🇱</span> ns3.be-a.dev</div>
-            <span class="live-indicator"><span class="live-dot"></span> Active</span>
-          </div>
-          <div class="node-ip">222.167.248.169</div>
-          <div class="node-meta">Warsaw, Poland &bull; Edge Gateway</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Expiration Health -->
-    <section id="expiry" class="section-container">
-      <div class="section-header">
-        <div class="pill-badge-sub">Reliability & Transparency</div>
-        <h2>Root Domain Renewal Health</h2>
-        <p class="section-desc">Automated RDAP verification keeps track of the parent domain lifecycle so your subdomains never go offline.</p>
-      </div>
-      <div id="expiry-grid" class="expiry-container">
-        <div class="expiry-card">
-          <div class="expiry-main">
-            <div>
-              <div class="expiry-domain">be-a.dev</div>
-              <div class="expiry-info">Registered until November 13, 2027 &bull; Google Registry</div>
-            </div>
-            <div class="expiry-badge healthy">364 Days Remaining</div>
-          </div>
-          <div class="progress-bar-bg">
-            <div class="progress-bar-fill" style="width: 100%;"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- Claim Modal -->
-  <div id="claim-modal" class="modal-backdrop">
-    <div class="modal-box">
-      <button id="modal-close" class="modal-close-btn">&times;</button>
-      <div class="modal-badge">GitOps Claim</div>
-      <h2>Claim <span id="modal-domain-title" class="highlight-text">yourname.be-a.dev</span></h2>
-      <p class="modal-subtitle">Configure your DNS record. A pre-filled pull request will be opened on GitHub.</p>
-
-      <div class="form-row">
-        <label for="github-username">GitHub Username</label>
-        <div class="input-with-icon">
-          <span class="input-icon">@</span>
-          <input type="text" id="github-username" placeholder="your-handle" autocomplete="off">
-        </div>
-      </div>
-
-      <div class="form-row">
-        <label for="record-type">Record Type</label>
-        <select id="record-type">
-          <option value="CNAME">CNAME &mdash; GitHub Pages, Vercel, Cloudflare, Fly.io</option>
-          <option value="A">A Record &mdash; VPS / Dedicated Server IPv4</option>
-          <option value="AAAA">AAAA Record &mdash; IPv6 Address</option>
-          <option value="TXT">TXT &mdash; Domain Verification</option>
-          <option value="NS">NS Delegation &mdash; Custom Nameservers</option>
-        </select>
-      </div>
-
-      <div class="form-row">
-        <label for="record-target" id="record-target-label">Target Host</label>
-        <input type="text" id="record-target" placeholder="username.github.io">
-        <small id="record-target-hint" class="input-hint">Specify the target FQDN or IP address.</small>
-      </div>
-
-      <div class="form-row">
-        <label>Generated JSON Definition Preview</label>
-        <div class="json-preview-wrapper">
-          <pre id="json-preview"></pre>
-        </div>
-      </div>
-
-      <a id="submit-pr-btn" href="#" target="_blank" rel="noopener" class="primary-btn full-width">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-        <span>Open Pull Request on GitHub</span>
-      </a>
-    </div>
-  </div>
-
-  <footer>
-    <div class="container footer-content">
+    <!-- Footer -->
+    <footer class="footer">
       <div class="footer-left">
-        <span class="brand-text">be-a<span class="brand-tld">.dev</span></span>
-        <span class="footer-copy">&copy; 2026 be-a.dev Registry &bull; MIT License</span>
+        <span>&copy; 2026 be-a.dev &bull; mit license</span>
       </div>
       <div class="footer-right">
-        <a href="https://github.com/xdearboy/be-a.dev" target="_blank" rel="noopener">GitHub</a>
-        <a href="https://be-a.dev/metrics" target="_blank" rel="noopener">Prometheus</a>
-        <a href="https://be-a.dev/api/status" target="_blank" rel="noopener">API Status</a>
+        <a href="https://github.com/xdearboy/be-a.dev" target="_blank" rel="noopener">[github]</a>
+        <a href="/metrics" target="_blank" rel="noopener">[metrics]</a>
+        <a href="/api/status" target="_blank" rel="noopener">[api]</a>
       </div>
-    </div>
-  </footer>
+    </footer>
+  </div>
 
   <script src="/static/app.js"></script>
 </body>

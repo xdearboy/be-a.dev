@@ -13,7 +13,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const jsonPreview = document.getElementById("json-preview");
   const submitPrBtn = document.getElementById("submit-pr-btn");
   const copyDigBtn = document.getElementById("copy-dig-btn");
-  const copyDigText = document.getElementById("copy-dig-text");
   const digCommand = document.getElementById("dig-command");
 
   let currentSubdomain = "";
@@ -25,14 +24,12 @@ document.addEventListener("DOMContentLoaded", () => {
     copyDigBtn.addEventListener("click", async () => {
       try {
         await navigator.clipboard.writeText(digCommand.innerText.trim());
-        if (copyDigText) copyDigText.innerText = "Copied!";
-        copyDigBtn.classList.add("copied");
+        copyDigBtn.innerText = "[copied!]";
         setTimeout(() => {
-          if (copyDigText) copyDigText.innerText = "Copy";
-          copyDigBtn.classList.remove("copied");
+          copyDigBtn.innerText = "[copy]";
         }, 2000);
       } catch (err) {
-        console.warn("Clipboard write failed", err);
+        console.warn("clipboard failed", err);
       }
     });
   }
@@ -46,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
         resultsContainer.innerHTML = "";
         return;
       }
-      searchTimeout = setTimeout(() => performSearch(query), 250);
+      searchTimeout = setTimeout(() => performSearch(query), 200);
     });
 
     searchInput.addEventListener("keydown", (e) => {
@@ -72,12 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function performSearch(query) {
     if (!resultsContainer) return;
-    resultsContainer.innerHTML = `
-      <div class="search-loading">
-        <span class="spinner"></span>
-        <span>Checking availability across Geo-DNS registry...</span>
-      </div>
-    `;
+    resultsContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 0.82rem;">querying registry...</p>`;
 
     try {
       const res = await fetch(`/api/check?name=${encodeURIComponent(query)}`);
@@ -85,12 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
       renderResults(data);
     } catch (err) {
-      console.error("Search failed:", err);
-      resultsContainer.innerHTML = `
-        <div class="search-error">
-          <span>Failed to query registry API. Please retry.</span>
-        </div>
-      `;
+      resultsContainer.innerHTML = `<p style="color: var(--red); font-size: 0.82rem;">error querying api</p>`;
     }
   }
 
@@ -98,51 +85,35 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!resultsContainer) return;
 
     if (!data.results || data.results.length === 0) {
-      resultsContainer.innerHTML = `
-        <div class="search-empty">
-          <span>No results for "<strong>${escapeHtml(data.subdomain || "")}</strong>"</span>
-        </div>
-      `;
+      resultsContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 0.82rem;">no results for "${escapeHtml(data.subdomain || "")}"</p>`;
       return;
     }
 
     resultsContainer.innerHTML = data.results.map(r => {
-      let badgeClass = "badge-available";
+      let tagHtml = "";
       let actionHtml = "";
-      const isAvailable = r.status === "available";
 
-      if (isAvailable) {
-        badgeClass = "badge-available";
-        actionHtml = `
-          <button class="primary-btn claim-action-btn" onclick="openClaimModal('${escapeHtml(data.subdomain)}', '${escapeHtml(r.zone)}')">
-            <span>Claim Domain</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </button>
-        `;
+      if (r.status === "available") {
+        tagHtml = `<span class="tag-ok">[available]</span>`;
+        actionHtml = `<button class="btn" onclick="openClaimModal('${escapeHtml(data.subdomain)}', '${escapeHtml(r.zone)}')">claim &rarr;</button>`;
       } else if (r.status === "taken") {
-        badgeClass = "badge-taken";
-        actionHtml = `
-          <span class="status-note taken">Active community domain</span>
-        `;
+        tagHtml = `<span class="tag-bad">[registered]</span>`;
+        actionHtml = `<span style="color: var(--text-muted); font-size: 0.8rem;">taken</span>`;
       } else {
-        badgeClass = "badge-reserved";
-        actionHtml = `
-          <span class="status-note reserved">${escapeHtml(r.message || "Reserved")}</span>
-        `;
+        tagHtml = `<span class="tag-warn">[reserved]</span>`;
+        actionHtml = `<span style="color: var(--text-muted); font-size: 0.8rem;">${escapeHtml(r.message || "reserved")}</span>`;
       }
 
       return `
-        <div class="result-card ${r.status}">
-          <div class="result-card-main">
-            <div class="result-header">
-              <span class="domain-name">${escapeHtml(r.fqdn)}</span>
-              <span class="badge ${badgeClass}">${escapeHtml(r.status)}</span>
+        <div class="result-card">
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span class="result-domain">${escapeHtml(r.fqdn)}</span>
+              ${tagHtml}
             </div>
-            <p class="result-desc">${escapeHtml(r.message)}</p>
+            <div class="result-msg">${escapeHtml(r.message)}</div>
           </div>
-          <div class="result-card-actions">
-            ${actionHtml}
-          </div>
+          <div>${actionHtml}</div>
         </div>
       `;
     }).join("");
@@ -157,22 +128,15 @@ document.addEventListener("DOMContentLoaded", () => {
     updateJsonPreview();
     if (modal) {
       modal.classList.add("active");
-      document.body.style.overflow = "hidden";
       if (githubUserInput) githubUserInput.focus();
     }
   };
 
   function closeModal() {
-    if (modal) {
-      modal.classList.remove("active");
-      document.body.style.overflow = "";
-    }
+    if (modal) modal.classList.remove("active");
   }
 
-  if (modalClose) {
-    modalClose.addEventListener("click", closeModal);
-  }
-
+  if (modalClose) modalClose.addEventListener("click", closeModal);
   if (modal) {
     modal.addEventListener("click", (e) => {
       if (e.target === modal) closeModal();
@@ -185,30 +149,29 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Dynamic hints depending on record type
   if (recordTypeSelect) {
     recordTypeSelect.addEventListener("change", () => {
       const type = recordTypeSelect.value;
       if (type === "CNAME") {
-        if (recordTargetLabel) recordTargetLabel.innerText = "Target Host (CNAME)";
+        if (recordTargetLabel) recordTargetLabel.innerText = "target host:";
         if (recordTargetInput) recordTargetInput.placeholder = "username.github.io";
-        if (recordTargetHint) recordTargetHint.innerText = "Target FQDN for GitHub Pages, Vercel, Fly.io, Cloudflare, etc.";
+        if (recordTargetHint) recordTargetHint.innerText = "Target FQDN for GitHub Pages, Vercel, Fly.io, etc.";
       } else if (type === "A") {
-        if (recordTargetLabel) recordTargetLabel.innerText = "IPv4 Address (A)";
+        if (recordTargetLabel) recordTargetLabel.innerText = "ipv4 address:";
         if (recordTargetInput) recordTargetInput.placeholder = "185.12.34.56";
-        if (recordTargetHint) recordTargetHint.innerText = "Direct IPv4 address of your dedicated server or VPS.";
+        if (recordTargetHint) recordTargetHint.innerText = "Dedicated VPS or server IPv4 address.";
       } else if (type === "AAAA") {
-        if (recordTargetLabel) recordTargetLabel.innerText = "IPv6 Address (AAAA)";
+        if (recordTargetLabel) recordTargetLabel.innerText = "ipv6 address:";
         if (recordTargetInput) recordTargetInput.placeholder = "2a01:4f8:...";
-        if (recordTargetHint) recordTargetHint.innerText = "Direct IPv6 address of your server.";
+        if (recordTargetHint) recordTargetHint.innerText = "Direct server IPv6 address.";
       } else if (type === "TXT") {
-        if (recordTargetLabel) recordTargetLabel.innerText = "Text Record (TXT)";
-        if (recordTargetInput) recordTargetInput.placeholder = "google-site-verification=...";
+        if (recordTargetLabel) recordTargetLabel.innerText = "txt value:";
+        if (recordTargetInput) recordTargetInput.placeholder = "verification-code";
         if (recordTargetHint) recordTargetHint.innerText = "Arbitrary verification or configuration string.";
       } else if (type === "NS") {
-        if (recordTargetLabel) recordTargetLabel.innerText = "Nameservers (comma-separated)";
+        if (recordTargetLabel) recordTargetLabel.innerText = "nameservers (comma-separated):";
         if (recordTargetInput) recordTargetInput.placeholder = "ns1.he.net, ns2.he.net";
-        if (recordTargetHint) recordTargetHint.innerText = "Delegate subdomain DNS management to external nameservers.";
+        if (recordTargetHint) recordTargetHint.innerText = "Delegate DNS management to external NS.";
       }
       updateJsonPreview();
     });
@@ -221,7 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateJsonPreview() {
     const type = recordTypeSelect ? recordTypeSelect.value : "CNAME";
     const rawTarget = recordTargetInput ? recordTargetInput.value.trim() : "";
-    const username = (githubUserInput ? githubUserInput.value.trim() : "") || "your-github-username";
+    const username = (githubUserInput ? githubUserInput.value.trim() : "") || "username";
 
     let defaultTarget = "username.github.io";
     if (type === "A") defaultTarget = "185.12.34.56";
@@ -247,7 +210,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const payload = {
       "$schema": "../../../schemas/domain.schema.json",
-      "description": `Free subdomain for ${username}`,
+      "description": `subdomain for ${username}`,
       "owner": {
         "username": username
       },
@@ -258,7 +221,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const jsonStr = JSON.stringify(payload, null, 2);
     if (jsonPreview) jsonPreview.innerText = jsonStr;
 
-    // GitHub 1-Click PR URL
     const shard = currentSubdomain ? currentSubdomain[0] : "a";
     const filePath = `domains/${currentZone}/${shard}/${currentSubdomain}.json`;
     const repoBase = "https://github.com/xdearboy/be-a.dev/new/main";
@@ -275,52 +237,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const grid = document.getElementById("status-grid");
       if (data.nameservers && grid) {
-        const flagMap = { "ns1": "🇳🇱", "ns2": "🇩🇪", "ns3": "🇵🇱" };
-        grid.innerHTML = data.nameservers.map(ns => {
-          const flag = flagMap[ns.host] || "🌐";
-          return `
-            <div class="node-card">
-              <div class="node-top">
-                <div class="node-host"><span class="flag">${flag}</span> ${ns.host}.${data.primary_zone || "be-a.dev"}</div>
-                <span class="live-indicator"><span class="live-dot"></span> Active</span>
-              </div>
-              <div class="node-ip">${ns.ip}</div>
-              <div class="node-meta">${ns.region} &bull; Authoritative CoreDNS</div>
-            </div>
-          `;
-        }).join("");
+        grid.innerHTML = data.nameservers.map(ns => `
+          <tr>
+            <td>${ns.host}.${data.primary_zone || "be-a.dev"}</td>
+            <td><code>${ns.ip}</code></td>
+            <td>${ns.region}</td>
+            <td><span class="tag-ok">active</span></td>
+          </tr>
+        `).join("");
       }
 
       const expiryGrid = document.getElementById("expiry-grid");
       if (data.expiry && expiryGrid) {
         expiryGrid.innerHTML = data.expiry.map(e => {
-          let badgeClass = "healthy";
-          let badgeText = `${e.days_remaining} Days Remaining`;
-          let fillWidth = "100%";
-
-          if (e.status === "warning") {
-            badgeClass = "warning";
-            badgeText = `${e.days_remaining} Days Remaining (Renewal Warning)`;
-            fillWidth = "25%";
-          } else if (e.status === "critical" || e.status === "expired") {
-            badgeClass = "critical";
-            badgeText = `${e.days_remaining} Days (Action Required)`;
-            fillWidth = "5%";
-          }
-
-          const expDate = e.expires_at ? new Date(e.expires_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : "November 13, 2027";
+          const expDate = e.expires_at ? new Date(e.expires_at).toISOString().split("T")[0] : "2027-11-13";
           return `
-            <div class="expiry-card">
-              <div class="expiry-main">
-                <div>
-                  <div class="expiry-domain">${e.domain}</div>
-                  <div class="expiry-info">Registered until ${expDate} &bull; Google Registry</div>
-                </div>
-                <div class="expiry-badge ${badgeClass}">${badgeText}</div>
+            <div class="health-line">
+              <div>
+                <span class="health-domain">${e.domain}</span>
+                <span class="health-days">&bull; ${e.days_remaining} days left</span>
               </div>
-              <div class="progress-bar-bg">
-                <div class="progress-bar-fill ${badgeClass}" style="width: ${fillWidth};"></div>
-              </div>
+              <div class="health-meta">expires: ${expDate} &bull; google registry (${e.source || "rdap"} verified)</div>
             </div>
           `;
         }).join("");
