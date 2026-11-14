@@ -26,6 +26,8 @@ type CheckResult struct {
 	FQDN    string `json:"fqdn"`
 	Status  string `json:"status"`
 	Message string `json:"message"`
+	Owner   string `json:"owner,omitempty"`
+	Target  string `json:"target,omitempty"`
 }
 
 type CheckResponse struct {
@@ -41,11 +43,12 @@ type NameserverStatus struct {
 }
 
 type StatusResponse struct {
-	PrimaryZone string                `json:"primary_zone"`
-	Nameservers []NameserverStatus    `json:"nameservers"`
-	Expiry      []expiry.DomainExpiry `json:"expiry"`
-	TotalZones  int                   `json:"total_zones"`
-	Timestamp   string                `json:"timestamp"`
+	PrimaryZone  string                `json:"primary_zone"`
+	Nameservers  []NameserverStatus    `json:"nameservers"`
+	Expiry       []expiry.DomainExpiry `json:"expiry"`
+	TotalZones   int                   `json:"total_zones"`
+	TotalDomains int                   `json:"total_domains"`
+	Timestamp    string                `json:"timestamp"`
 }
 
 type FallbackData struct {
@@ -203,9 +206,23 @@ func (s *Server) handleCheck(w http.ResponseWriter, r *http.Request) {
 
 		shard := string(name[0])
 		jsonPath := filepath.Join(s.domainsDir, zone, shard, fmt.Sprintf("%s.json", name))
-		if _, err := os.Stat(jsonPath); err == nil {
+		if data, err := os.ReadFile(jsonPath); err == nil {
 			res.Status = "taken"
-			res.Message = "Already registered by another user"
+			res.Message = "Registered"
+
+			var cfg models.DomainConfig
+			if err := json.Unmarshal(data, &cfg); err == nil {
+				res.Owner = cfg.Owner.Username
+				if cfg.Records.CNAME != "" {
+					res.Target = fmt.Sprintf("CNAME %s", cfg.Records.CNAME)
+				} else if len(cfg.Records.A) > 0 {
+					res.Target = fmt.Sprintf("A %s", cfg.Records.A[0])
+				} else if len(cfg.Records.AAAA) > 0 {
+					res.Target = fmt.Sprintf("AAAA %s", cfg.Records.AAAA[0])
+				} else if len(cfg.Records.NS) > 0 {
+					res.Target = fmt.Sprintf("NS %s", strings.Join(cfg.Records.NS, ", "))
+				}
+			}
 		} else {
 			res.Status = "available"
 			res.Message = "Available for instant claim"
@@ -236,12 +253,21 @@ func (s *Server) handleStatus(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
+	totalDomains := 0
+	_ = filepath.Walk(s.domainsDir, func(path string, info os.FileInfo, err error) error {
+		if err == nil && !info.IsDir() && strings.HasSuffix(path, ".json") {
+			totalDomains++
+		}
+		return nil
+	})
+
 	resp := StatusResponse{
-		PrimaryZone: "be-a.dev",
-		Nameservers: nsList,
-		Expiry:      s.expiryChecker.CheckMultiple(s.primaryZones),
-		TotalZones:  len(s.primaryZones),
-		Timestamp:   time.Now().UTC().Format(time.RFC3339),
+		PrimaryZone:  "be-a.dev",
+		Nameservers:  nsList,
+		Expiry:       s.expiryChecker.CheckMultiple(s.primaryZones),
+		TotalZones:   len(s.primaryZones),
+		TotalDomains: totalDomains,
+		Timestamp:    time.Now().UTC().Format(time.RFC3339),
 	}
 
 	_ = json.NewEncoder(w).Encode(resp)

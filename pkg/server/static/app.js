@@ -101,7 +101,27 @@ document.addEventListener("DOMContentLoaded", () => {
       } else if (r.status === "taken") {
         dotClass = "dot-taken";
         stateClass = "state-taken";
-        actionHtml = `<span style="color: var(--text-muted); font-size: 0.82rem;">Taken</span>`;
+        const shard = data.subdomain ? data.subdomain[0] : "a";
+        const fileUrl = `https://github.com/xdearboy/be-a.dev/blob/main/domains/${encodeURIComponent(r.zone)}/${encodeURIComponent(shard)}/${encodeURIComponent(data.subdomain)}.json`;
+        let metaParts = [];
+        if (r.target) metaParts.push(escapeHtml(r.target));
+        if (r.owner) {
+          metaParts.push(`owner <a href="https://github.com/${encodeURIComponent(r.owner)}" target="_blank" rel="noopener" style="color: var(--text); text-decoration: underline;">@${escapeHtml(r.owner)}</a>`);
+        }
+        const metaStr = metaParts.length > 0 ? ` &bull; ${metaParts.join(" &bull; ")}` : "";
+        actionHtml = `<a href="${fileUrl}" target="_blank" rel="noopener" class="taken-link">view config &rarr;</a>`;
+        return `
+          <div class="result-entry">
+            <div>
+              <div class="result-domain-line">${escapeHtml(r.fqdn)}</div>
+              <div class="result-state ${stateClass}">
+                <span class="dot ${dotClass}"></span>
+                <span>${escapeHtml(r.message)}${metaStr}</span>
+              </div>
+            </div>
+            <div>${actionHtml}</div>
+          </div>
+        `;
       } else {
         dotClass = "dot-reserved";
         stateClass = "state-reserved";
@@ -250,10 +270,15 @@ document.addEventListener("DOMContentLoaded", () => {
         `).join("");
       }
 
-      if (data.expiry && data.expiry.length > 0 && expiryText) {
-        const rootExp = data.expiry[0];
-        const expDate = rootExp.expires_at ? new Date(rootExp.expires_at).toLocaleDateString("en-US", { month: "short", year: "numeric" }) : "Nov 2027";
-        expiryText.innerText = `registered through ${expDate} (${rootExp.days_remaining} days left)`;
+      if (expiryText) {
+        let domainCountStr = data.total_domains ? `${data.total_domains} active domains &bull; ` : "";
+        let expStr = "registered through Nov 2027";
+        if (data.expiry && data.expiry.length > 0) {
+          const rootExp = data.expiry[0];
+          const expDate = rootExp.expires_at ? new Date(rootExp.expires_at).toLocaleDateString("en-US", { month: "short", year: "numeric" }) : "Nov 2027";
+          expStr = `root domain registered through ${expDate}`;
+        }
+        expiryText.innerHTML = `${domainCountStr}${expStr}`;
       }
     } catch (e) {
       console.warn("Status fetch failed", e);

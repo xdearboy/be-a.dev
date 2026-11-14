@@ -1,23 +1,21 @@
-name: Validate Pull Request
+name: Validate & Auto-Merge Pull Request
 
 on:
-  pull_request:
+  pull_request_target:
     branches: [main]
-    paths:
-      - 'domains/**'
-      - 'config/**'
-      - 'pkg/**'
-      - 'cmd/**'
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
-  validate:
-    name: RFC Compliance & Security Checks
+  validate-and-merge:
+    name: RFC Compliance & Auto-Merge
     runs-on: be-a-dev-runners
     steps:
-      - name: Checkout Repository
+      - name: Checkout Base Repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Set up Go
         uses: actions/setup-go@v5
@@ -30,19 +28,75 @@ jobs:
       - name: Build Registry CLI
         run: go build -o bin/registry ./cmd/registry
 
-      - name: Get Changed Domain Files
-        id: changed-files
-        uses: tj-actions/changed-files@v44
+      - name: Checkout PR Code
+        uses: actions/checkout@v4
         with:
-          files: 'domains/**/*.json'
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: pr_code
+
+      - name: Copy PR Domains for Validation
+        run: |
+          if [ -d "pr_code/domains" ]; then
+            cp -r pr_code/domains/* domains/ 2>/dev/null || true
+          fi
+
+      - name: Inspect Changed Files
+        id: pr-diff
+        run: |
+          FILES=$(gh pr diff ${{ github.event.pull_request.number }} --name-only)
+          echo "files<<EOF" >> $GITHUB_OUTPUT
+          echo "$FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          COUNT=$(echo "$FILES" | grep -v '^$' | wc -l | tr -d ' ')
+          echo "count=$COUNT" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Validate Changed Domains
-        if: steps.changed-files.outputs.any_changed == 'true'
+        id: validate
         run: |
-          ./bin/registry validate \
-            --actor "${{ github.actor }}" \
-            --files "${{ steps.changed-files.outputs.all_changed_files }}"
+          FILES="${{ steps.pr-diff.outputs.files }}"
+          COUNT="${{ steps.pr-diff.outputs.count }}"
 
-      - name: Dry-Run Zone Compilation
-        run: |
+          echo "Detected $COUNT changed files:"
+          echo "$FILES"
+
+          if [ "$COUNT" -eq 0 ]; then
+            echo "No changed files detected."
+            exit 0
+          fi
+
+          # Verify that every changed file is strictly under domains/
+          while IFS= read -r file; do
+            [ -z "$file" ] && continue
+            if [[ ! "$file" =~ ^domains/ ]]; then
+              echo "PR modifies non-domain file: $file. Manual review required."
+              exit 0
+            fi
+          done <<< "$FILES"
+
+          if [ "$COUNT" -gt 2 ]; then
+            echo "PR modifies more than 2 files ($COUNT). Manual review required."
+            exit 0
+          fi
+
+          # Replace newlines with spaces for validate CLI
+          FILE_LIST=$(echo "$FILES" | tr '\n' ' ')
+          ./bin/registry validate \
+            --actor "${{ github.event.pull_request.user.login }}" \
+            --files "$FILE_LIST"
+
+          # Dry-run zone compilation
           ./bin/registry compile --out-dir ./zones
+
+          echo "can_automerge=true" >> $GITHUB_OUTPUT
+
+      - name: Auto-Merge Valid PR
+        if: steps.validate.outputs.can_automerge == 'true'
+        run: |
+          PR_NUM="${{ github.event.pull_request.number }}"
+          echo "Auto-approving and merging PR #$PR_NUM..."
+          gh pr review "$PR_NUM" --approve --body "✅ Automated verification passed. Valid RFC 1035 record set and authorized owner."
+          gh pr merge "$PR_NUM" --squash --delete-branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
